@@ -4,6 +4,7 @@
 
 import sys
 import os
+import time
 import datetime
 import cv2
 import base64
@@ -32,28 +33,33 @@ if config["mqtt_use_auth"] == True:
 mqtt_client.connect(config["mqtt_host"], port=config["mqtt_port"], keepalive=60)
 mqtt_client.loop_start()
 
+
 # image capture from WebCamera
 cap = cv2.VideoCapture(0)
 
-for i in range(10):
-  ret, img = cap.read()
+while True:
+    for i in range(10):
+      ret, img = cap.read()
+    
+    img = cv2.resize(img, (config["jpeg_width"], config["jpeg_height"]))
+    
+    ret, buf = cv2.imencode(".jpg", img, (cv2.IMWRITE_JPEG_QUALITY, config["jpeg_quality"]))
+    
+    with open("img.jpg", "wb") as f:
+        f.write(buf)
+    
+    # publish
+    b64 = base64.b64encode(buf) # byte
+    uri = "data:image/jpeg;base64," + b64.decode()  # byte.decode() : byte->str
+    
+    dt = datetime.datetime.now()
+    logging.debug("publish : topic=" + config["mqtt_publish_topic_time"])
+    mqtt_client.publish(config["mqtt_publish_topic_time"], dt.isoformat(), retain=True)
+    
+    payload = {"image":uri}
+    logging.debug(f"publish : topic=" + config["mqtt_publish_topic_img"])
+    mqtt_client.publish(config["mqtt_publish_topic_img"], json.dumps(payload), retain=True)
 
-cap.release()
-
-img = cv2.resize(img, (config["jpeg_width"], config["jpeg_height"]))
-
-ret, buf = cv2.imencode(".jpg", img, (cv2.IMWRITE_JPEG_QUALITY, config["jpeg_quality"]))
-
-with open("img.jpg", "wb") as f:
-    f.write(buf)
-
-# publish
-b64 = base64.b64encode(buf) # byte
-uri = "data:image/jpeg;base64," + b64.decode()  # byte.decode() : byte->str
-
-dt = datetime.datetime.now()
-mqtt_client.publish(config["mqtt_publish_topic_time"], dt.isoformat(), retain=True)
-
-payload = {"image":uri}
-mqtt_client.publish(config["mqtt_publish_topic_img"], json.dumps(payload), retain=True)
+    # sleep
+    time.sleep(config["sleep_time"])
 

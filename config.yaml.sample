@@ -10,3 +10,4 @@ jpeg_width:   240
 jpeg_height:  160
 jpeg_quality: 20
 
+sleep_time: 10
