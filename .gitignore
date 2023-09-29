@@ -1,0 +1,7 @@
+img.jpg
+config.yaml
+log*.txt
+
+*.swp
+*~
+

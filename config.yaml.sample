@@ -1,0 +1,12 @@
+mqtt_host: iot.eclipse.org
+mqtt_port: 1883
+mqtt_use_auth: false
+mqtt_username: username
+mqtt_password: password
+mqtt_publish_topic_img:  web_camera/01/image
+mqtt_publish_topic_time: web_camera/01/publish_time
+
+jpeg_width:   240
+jpeg_height:  160
+jpeg_quality: 20
+
