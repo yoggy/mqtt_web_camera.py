@@ -2,7 +2,7 @@
 
 ## How to use
 ```
-$ git clone https://github.com/yoggy/mqtt_web_camera.git
+$ git clone https://github.com/yoggy/mqtt_web_camera.py.git
 $ cd mqtt_web_camera
 $ sudo apt install python3-opencv  python3-yaml
 $ sudo pip3 install paho-mqtt
