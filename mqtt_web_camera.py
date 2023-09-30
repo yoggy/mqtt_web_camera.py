@@ -13,6 +13,13 @@ import yaml
 from pprint import pprint
 import paho.mqtt.client as mqtt
 
+import RPi.GPIO as GPIO
+
+gpio_led = 21 #GPIO21, see also... https://mamerium.com/raspberry-pi-rpi-gpio-basic/
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(gpio_led, GPIO.OUT) 
+GPIO.output(gpio_led, GPIO.LOW)
+
 os.chdir(os.path.dirname(__file__))
 
 # https://qiita.com/yohm/items/e95950a5d3eba8915e99
@@ -38,8 +45,12 @@ mqtt_client.loop_start()
 cap = cv2.VideoCapture(0)
 
 while True:
+    GPIO.output(gpio_led, GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(gpio_led, GPIO.LOW)
+
     for i in range(10):
-      ret, img = cap.read()
+        ret, img = cap.read()
     
     img = cv2.resize(img, (config["jpeg_width"], config["jpeg_height"]))
     
@@ -61,5 +72,5 @@ while True:
     mqtt_client.publish(config["mqtt_publish_topic_img"], json.dumps(payload), retain=True)
 
     # sleep
-    time.sleep(config["sleep_time"])
+    time.sleep(config["sleep_time"]-1)
 
